@@ -12,6 +12,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.5.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\TestApp.Core\TestApp.Core.csproj" />
   </ItemGroup>
 </Project>
