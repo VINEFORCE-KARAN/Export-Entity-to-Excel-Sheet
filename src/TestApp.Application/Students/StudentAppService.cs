@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TestApp.Dto;
 using TestApp.Students.Dto;
+using Microsoft.AspNetCore.Http;
 using TestApp.Students.Exporting;
 using Microsoft.AspNetCore.Mvc;
+using TestApp.Students.Importing;
 
 
 namespace TestApp.Students
@@ -15,13 +17,16 @@ namespace TestApp.Students
     {
         private readonly IRepository<Student, int> _studentRepository;
         private readonly IStudentListExcelExporter _studentListExcelExporter;
+        private readonly IStudentExcelImporter _studentListExcelImporter;
 
         public StudentAppService(IRepository<Student, int> studentRepository,
-               IStudentListExcelExporter studentListExcelExporter)
+                                 IStudentListExcelExporter studentListExcelExporter,
+                                 IStudentExcelImporter studentListExcelImporter)
 
         {
             _studentRepository = studentRepository;
             _studentListExcelExporter = studentListExcelExporter;
+            _studentListExcelImporter = studentListExcelImporter;
 
         }
 
@@ -46,7 +51,7 @@ namespace TestApp.Students
         {
             var student = await _studentRepository.GetAsync(input.Id);
             ObjectMapper.Map(input, student);
-            await _studentRepository.UpdateAsync(student); 
+            await _studentRepository.UpdateAsync(student);
         }
 
         // Export students to Excel
@@ -68,5 +73,12 @@ namespace TestApp.Students
         }
 
 
+        // Import students from Excel 
+        public async Task ImportStudentsFromExcel(IFormFile file)
+        {
+            await _studentListExcelImporter.ImportFromExcelAsync(file);
+
+
+        }
     }
 }

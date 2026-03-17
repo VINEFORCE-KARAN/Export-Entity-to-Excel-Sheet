@@ -19,7 +19,8 @@ namespace TestApp.Students.Exporting
                 var worksheet = package.Workbook.Worksheets.Add("Students");
 
                 worksheet.Cells[1, 1].Value = "Name";
-                worksheet.Cells[1, 2].Value = "Email";
+                worksheet.Cells[1, 2].Value = "Age";
+                worksheet.Cells[1, 3].Value = "Course";
 
                 int row = 2;
 
