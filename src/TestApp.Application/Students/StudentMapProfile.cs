@@ -16,7 +16,8 @@ namespace TestApp.Students
             CreateMap<CreateStudentDto, Student>();
             CreateMap<UpdateStudentDto, Student>();
             CreateMap<Student, StudentDto>();
-            
+            CreateMap<StudentDto, Student>();
+
         }
     }
 }

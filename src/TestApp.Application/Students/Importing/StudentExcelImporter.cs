@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Abp.Dependency;
+using Abp.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
+using System.Collections.Generic;
 using System.IO;
-using Abp.Domain.Repositories;
-using Abp.Dependency;
+using System.Threading.Tasks;
 using TestApp.Students;
+using TestApp.Students.Dto;
 
 namespace TestApp.Students.Importing
 {
@@ -17,9 +19,11 @@ namespace TestApp.Students.Importing
             _studentRepository = studentRepository;
         }
 
-        public async Task ImportFromExcelAsync(IFormFile file)
+        public async Task<List<StudentDto>> ImportFromExcelAsync(IFormFile file)
         {
             ExcelPackage.License.SetNonCommercialPersonal("TestApp");
+
+            var students = new List<StudentDto>();
 
             using (var stream = new MemoryStream())
             {
@@ -28,33 +32,27 @@ namespace TestApp.Students.Importing
                 using (var package = new ExcelPackage(stream))
                 {
                     var worksheet = package.Workbook.Worksheets[0];
-
                     int rowCount = worksheet.Dimension.Rows;
 
-                    for (int row = 2; row <= rowCount; row++) // row 1 = header skip
+                    for (int row = 2; row <= rowCount; row++)
                     {
-                        var name = worksheet.Cells[row, 1].Text;
-                        var ageText = worksheet.Cells[row, 2].Text;
-                        var course = worksheet.Cells[row, 3].Text;
-
-                        // Skip empty rows
-                        if (string.IsNullOrWhiteSpace(name))
-                            continue;
-
                         int age = 0;
-                        int.TryParse(ageText, out age);
+                        int.TryParse(worksheet.Cells[row, 2].Text, out age); // 🔥 safe parse
 
-                        var student = new Student
+                        var student = new StudentDto
                         {
-                            Name = name,
+                            Name = worksheet.Cells[row, 1].Text?.Trim(),
                             Age = age,
-                            Course = course
+                            Course = worksheet.Cells[row, 3].Text?.Trim(),
+                            Email = worksheet.Cells[row, 4].Text?.Trim()
                         };
 
-                        await _studentRepository.InsertAsync(student);
+                        students.Add(student);
                     }
                 }
             }
+
+            return students;
         }
     }
 }
